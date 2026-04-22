@@ -51,5 +51,7 @@ data class SettingsState(
     val messageLinkHandlingSummary: String = "Ask before opening",
     val messageLinkHandlingId: Int = 2,
     val disableScreenshotsEnabled: Boolean = false,
+    val translateLanguageSummary: String = "Hindi",
+    val translateLanguageId: Int = 0,
     val syncProgress: SyncRepository.SyncProgress = SyncRepository.SyncProgress.Idle
 )

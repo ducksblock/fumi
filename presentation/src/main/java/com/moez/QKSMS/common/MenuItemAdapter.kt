@@ -55,10 +55,18 @@ class MenuItemAdapter @Inject constructor(private val context: Context, private 
         }
 
     fun setData(@ArrayRes titles: Int, @ArrayRes values: Int = -1) {
-        val valueInts = if (values != -1) context.resources.getIntArray(values) else null
+        val titlesArray = context.resources.getStringArray(titles)
+        val valueInts = if (values != -1) {
+            try {
+                context.resources.getIntArray(values)
+            } catch (e: Exception) {
+                null
+            }
+        } else null
 
-        data = context.resources.getStringArray(titles)
-                .mapIndexed { index, title -> MenuItem(title, valueInts?.getOrNull(index) ?: index) }
+        data = titlesArray.mapIndexed { index, title -> 
+            MenuItem(title, valueInts?.getOrNull(index) ?: index) 
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QkBindingViewHolder<MenuListItemBinding> {
@@ -83,8 +91,18 @@ class MenuItemAdapter @Inject constructor(private val context: Context, private 
         val menuItem = getItem(position)
 
         holder.binding.title.text = menuItem.title
-        holder.binding.check.isActivated = (menuItem.actionId == selectedItem)
+        val isSelected = (menuItem.actionId == selectedItem)
+        holder.binding.check.isActivated = isSelected
         holder.binding.check.setVisible(selectedItem != null)
+        
+        if (isSelected) {
+            // Apply a semi-transparent theme-colored background to highlight the selected item
+            holder.binding.root.backgroundTintList = ColorStateList.valueOf(colors.theme().theme and 0x33FFFFFF) // 20% opacity
+            holder.binding.root.backgroundTintMode = android.graphics.PorterDuff.Mode.SRC_OVER
+        } else {
+            // Reset to default (which allows ?attr/selectableItemBackground to show clearly)
+            holder.binding.root.backgroundTintList = null
+        }
     }
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {

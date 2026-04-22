@@ -1,0 +1,7 @@
+[
+{
+  "directory": "D:/Code/2026/fumi/fumi/presentation/.cxx/Debug/6i4i4ur3/arm64-v8a",
+  "command": "C:\\Users\\prana\\AppData\\Local\\Android\\Sdk\\ndk\\25.1.8937393\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=aarch64-none-linux-android26 --sysroot=C:/Users/prana/AppData/Local/Android/Sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Dfumi_native_EXPORTS -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info  -fPIC -o CMakeFiles\\fumi-native.dir\\dummy.cpp.o -c D:\\Code\\2026\\fumi\\fumi\\presentation\\src\\main\\cpp\\dummy.cpp",
+  "file": "D:\\Code\\2026\\fumi\\fumi\\presentation\\src\\main\\cpp\\dummy.cpp"
+}
+]

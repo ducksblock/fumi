@@ -190,22 +190,22 @@ class Navigator @Inject constructor(
     }
 
     fun showDeveloper() {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/quik-sms/quik/graphs/contributors"))
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/ducksblock/fumi/graphs/contributors"))
         startActivityExternal(intent)
     }
 
     fun showSourceCode() {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/quik-sms/quik"))
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/ducksblock/fumi"))
         startActivityExternal(intent)
     }
 
     fun showChangelog() {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/quik-sms/quik/releases"))
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/ducksblock/fumi/releases"))
         startActivityExternal(intent)
     }
 
     fun showLicense() {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/quik-sms/quik/blob/master/LICENSE"))
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/ducksblock/fumi/blob/master/LICENSE"))
         startActivityExternal(intent)
     }
 
@@ -221,12 +221,12 @@ class Navigator @Inject constructor(
     }
 
     fun showDonation() {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/quik-sms/quik"))
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/ducksblock/fumi"))
         startActivityExternal(intent)
     }
 
     fun showRating() {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/quik-sms/quik"))
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/ducksblock/fumi"))
                 .addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY
                         or Intent.FLAG_ACTIVITY_NEW_DOCUMENT
                         or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
@@ -234,7 +234,7 @@ class Navigator @Inject constructor(
         try {
             startActivityExternal(intent)
         } catch (e: ActivityNotFoundException) {
-            val url = "https://github.com/quik-sms/quik"
+            val url = "https://github.com/ducksblock/fumi"
             startActivityExternal(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
         }
     }
@@ -269,8 +269,7 @@ class Navigator @Inject constructor(
     fun showSupport() {
         val intent = Intent(Intent.ACTION_SENDTO)
         intent.data = Uri.parse("mailto:")
-        intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("quik@octo.sh"))
-        intent.putExtra(Intent.EXTRA_SUBJECT, "QUIK Support")
+        intent.putExtra(Intent.EXTRA_SUBJECT, "fumi Support")
         intent.putExtra(Intent.EXTRA_TEXT, StringBuilder("\n\n")
                 .append("\n\n--- Please write your message above this line ---\n\n")
                 .append("Package: ${context.packageName}\n")
@@ -286,7 +285,7 @@ class Navigator @Inject constructor(
     fun showInvite() {
         Intent(Intent.ACTION_SEND)
                 .setType("text/plain")
-                .putExtra(Intent.EXTRA_TEXT, "https://github.com/quik-sms/quik/releases/latest")
+                .putExtra(Intent.EXTRA_TEXT, "https://github.com/ducksblock/fumi/releases/latest")
                 .let { Intent.createChooser(it, null) }
                 .let(::startActivityExternal)
     }

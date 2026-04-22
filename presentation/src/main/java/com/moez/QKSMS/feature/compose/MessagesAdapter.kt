@@ -18,8 +18,12 @@
  */
 package dev.octoshrimpy.quik.feature.compose
 
+import android.animation.Animator
 import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Context
+import android.graphics.drawable.TransitionDrawable
+import android.view.animation.LinearInterpolator
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
@@ -35,9 +39,11 @@ import android.text.util.Linkify
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.jakewharton.rxbinding2.view.clicks
 import com.moez.QKSMS.common.QkMediaPlayer
@@ -111,6 +117,9 @@ class MessagesAdapter @Inject constructor(
     val resendClicks: Subject<Long> = PublishSubject.create()
     val partContextMenuRegistrar: Subject<View> = PublishSubject.create()
     val reactionClicks: Subject<Long> = PublishSubject.create()
+    val translateClicks: Subject<Long> = PublishSubject.create()
+
+    private val SPIN_ANIM_TAG = R.id.translateIcon  // reuse existing id as a tag key
 
     var data: Pair<Conversation, RealmResults<Message>>? = null
         set(value) {
@@ -225,6 +234,71 @@ class MessagesAdapter @Inject constructor(
             reactionText = binding.reactionText
             status = binding.status
 
+            // Bind translate button for outgoing message
+            // Bind translate button for outgoing message
+            val processingStateOut = processingTranslations[message.id]
+            val cachedOut = translationCache[message.id]
+            
+            bindTranslateButton(
+                container = binding.translateContainer,
+                icon = binding.translateIcon,
+                processingState = processingStateOut,
+                hasCachedTranslation = cachedOut != null
+            )
+            if (cachedOut != null) {
+                val languageCode = prefs.translateLanguage.get()
+                val targetLang = java.util.Locale(languageCode).displayLanguage
+                val sourceLang = if (cachedOut.sourceLanguage == "und") "Unknown" else java.util.Locale(cachedOut.sourceLanguage).displayLanguage
+                
+                val cachedOutText = android.text.SpannableStringBuilder("${cachedOut.result}\n\n—\n✨ ")
+                val start = cachedOutText.length
+                cachedOutText.append("Message translated from $sourceLang to $targetLang")
+                cachedOutText.setSpan(android.text.style.StyleSpan(android.graphics.Typeface.ITALIC), start, cachedOutText.length, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                cachedOutText.setSpan(android.text.style.RelativeSizeSpan(0.75f), start - 6, cachedOutText.length, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                cachedOutText.setSpan(android.text.style.ForegroundColorSpan(androidx.core.content.ContextCompat.getColor(context, android.R.color.white)), start - 6, cachedOutText.length, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                
+                binding.translatedBody.text = cachedOutText
+                if (binding.translatedBody.visibility != View.VISIBLE) {
+                    binding.translatedBody.visibility = View.VISIBLE
+                }
+            } else if (processingStateOut != null) {
+                val processingText = when (processingStateOut) {
+                    is dev.octoshrimpy.quik.manager.TranslationState.Downloading -> {
+                        val srcCode = processingStateOut.sourceLanguage.uppercase()
+                        val trgCode = processingStateOut.targetLanguage.uppercase()
+                        "Downloading $srcCode-$trgCode pack\nIt may take ~20-30s..."
+                    }
+                    is dev.octoshrimpy.quik.manager.TranslationState.Processing -> {
+                        val srcLang = if (processingStateOut.sourceLanguage == "und") "Unknown" else java.util.Locale(processingStateOut.sourceLanguage).displayLanguage
+                        if (processingStateOut.targetLanguage == "und" || processingStateOut.targetLanguage.isEmpty()) {
+                            "Detected $srcLang..."
+                        } else {
+                            "Translating from $srcLang..."
+                        }
+                    }
+                    else -> "Processing..."
+                }
+                val processingSpannable = android.text.SpannableStringBuilder(processingText)
+                processingSpannable.setSpan(android.text.style.RelativeSizeSpan(0.75f), 0, processingText.length, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                processingSpannable.setSpan(android.text.style.StyleSpan(android.graphics.Typeface.ITALIC), 0, processingText.length, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                
+                binding.translatedBody.text = processingSpannable
+                binding.translatedBody.setTextColor(theme.theme)
+                if (binding.translatedBody.visibility != View.VISIBLE) {
+                    binding.translatedBody.visibility = View.VISIBLE
+                }
+            } else {
+                binding.translatedBody.visibility = View.GONE
+            }
+            binding.translateContainer.setOnClickListener {
+                if (cachedOut != null) {
+                    android.widget.Toast.makeText(context, "This message has already been translated.", android.widget.Toast.LENGTH_SHORT).show()
+                } else if (!processingTranslations.containsKey(message.id)) {
+                    markTranslating(message.id)
+                    translateClicks.onNext(message.id)
+                }
+            }
+
             // bind the cancelFrame (cancel button) and send now button
             val isCancellable = message.isSending() && message.date > System.currentTimeMillis()
 
@@ -301,6 +375,74 @@ class MessagesAdapter @Inject constructor(
                     textSelectHandle?.setTint(R.attr.bubbleColor.withAlpha(0x7d))
                     textSelectHandleLeft?.setTint(R.attr.bubbleColor.withAlpha(0x7d))
                     textSelectHandleRight?.setTint(R.attr.bubbleColor.withAlpha(0x7d))
+                }
+            }
+
+            // Bind translate button for incoming message
+            val processingStateIn = processingTranslations[message.id]
+            val cachedIn = translationCache[message.id]
+            
+            bindTranslateButton(
+                container = binding.translateContainer,
+                icon = binding.translateIcon,
+                processingState = processingStateIn,
+                hasCachedTranslation = cachedIn != null
+            )
+            
+            if (cachedIn != null) {
+                val languageCode = prefs.translateLanguage.get()
+                val targetLang = java.util.Locale(languageCode).displayLanguage
+                val sourceLang = if (cachedIn.sourceLanguage == "und") "Unknown" else java.util.Locale(cachedIn.sourceLanguage).displayLanguage
+                
+                val cachedInText = android.text.SpannableStringBuilder("${cachedIn.result}\n\n—\n✨ ")
+                val start = cachedInText.length
+                cachedInText.append("Message translated from $sourceLang to $targetLang")
+                cachedInText.setSpan(android.text.style.StyleSpan(android.graphics.Typeface.ITALIC), start, cachedInText.length, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                cachedInText.setSpan(android.text.style.RelativeSizeSpan(0.75f), start - 6, cachedInText.length, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                cachedInText.setSpan(android.text.style.ForegroundColorSpan(androidx.core.content.ContextCompat.getColor(context, android.R.color.white)), start - 6, cachedInText.length, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                
+                binding.translatedBody.text = cachedInText
+                binding.translatedBody.setTextColor(theme.textPrimary)
+                binding.translatedBody.setBackgroundTint(theme.theme)
+                if (binding.translatedBody.visibility != View.VISIBLE) {
+                    binding.translatedBody.visibility = View.VISIBLE
+                }
+            } else if (processingStateIn != null) {
+                val processingText = when (processingStateIn) {
+                    is dev.octoshrimpy.quik.manager.TranslationState.Downloading -> {
+                        val srcCode = processingStateIn.sourceLanguage.uppercase()
+                        val trgCode = processingStateIn.targetLanguage.uppercase()
+                        "Downloading $srcCode-$trgCode pack\nIt may take ~20-30s..."
+                    }
+                    is dev.octoshrimpy.quik.manager.TranslationState.Processing -> {
+                        val srcLang = if (processingStateIn.sourceLanguage == "und") "Unknown" else java.util.Locale(processingStateIn.sourceLanguage).displayLanguage
+                        if (processingStateIn.targetLanguage == "und" || processingStateIn.targetLanguage.isEmpty()) {
+                            "Detected $srcLang..."
+                        } else {
+                            "Translating from $srcLang..."
+                        }
+                    }
+                    else -> "Processing..."
+                }
+                val processingSpannable = android.text.SpannableStringBuilder(processingText)
+                processingSpannable.setSpan(android.text.style.RelativeSizeSpan(0.75f), 0, processingText.length, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                processingSpannable.setSpan(android.text.style.StyleSpan(android.graphics.Typeface.ITALIC), 0, processingText.length, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+                binding.translatedBody.text = processingSpannable
+                binding.translatedBody.setTextColor(theme.theme)
+                binding.translatedBody.setBackgroundTint(androidx.core.content.ContextCompat.getColor(context, R.color.bubbleDark))
+                if (binding.translatedBody.visibility != View.VISIBLE) {
+                    binding.translatedBody.visibility = View.VISIBLE
+                }
+            } else {
+                binding.translatedBody.visibility = View.GONE
+            }
+            binding.translateContainer.setOnClickListener {
+                if (cachedIn != null) {
+                    android.widget.Toast.makeText(context, "This message has already been translated.", android.widget.Toast.LENGTH_SHORT).show()
+                } else if (!processingTranslations.containsKey(message.id)) {
+                    markTranslating(message.id)
+                    translateClicks.onNext(message.id)
                 }
             }
         }
@@ -512,6 +654,88 @@ class MessagesAdapter @Inject constructor(
     fun expandMessages(messageIds: List<Long>, expand: Boolean) {
         messageIds.forEach { expanded[it] = expand }
         notifyDataSetChanged()
+    }
+
+    // Keep track of which message IDs are currently translating, and what state they are in
+    private val processingTranslations = mutableMapOf<Long, dev.octoshrimpy.quik.manager.TranslationState>()
+    private val translationCache = mutableMapOf<Long, dev.octoshrimpy.quik.manager.TranslationState.Success>()
+
+    /**
+     * Called by the ViewModel when translation state changes (Downloading, Processing, Success, Error).
+     */
+    fun showTranslation(messageId: Long, state: dev.octoshrimpy.quik.manager.TranslationState) {
+        when (state) {
+            is dev.octoshrimpy.quik.manager.TranslationState.Downloading,
+            is dev.octoshrimpy.quik.manager.TranslationState.Processing -> {
+                processingTranslations[messageId] = state
+            }
+            is dev.octoshrimpy.quik.manager.TranslationState.Success -> {
+                processingTranslations.remove(messageId)
+                translationCache[messageId] = state
+            }
+            is dev.octoshrimpy.quik.manager.TranslationState.Error -> {
+                processingTranslations.remove(messageId)
+                val errorMessage = state.cause.localizedMessage ?: "Translation failed"
+                translationCache[messageId] = dev.octoshrimpy.quik.manager.TranslationState.Success("Error: $errorMessage", "error")
+            }
+        }
+        val position = (0 until itemCount).firstOrNull { getItem(it)?.id == messageId }
+        position?.let { notifyItemChanged(it) }
+    }
+
+    /**
+     * Marks a message as being translated initially.
+     */
+    private fun markTranslating(messageId: Long) {
+        // Assume initializing/processing initially before actual state is piped from ML Kit
+        processingTranslations[messageId] = dev.octoshrimpy.quik.manager.TranslationState.Processing("und", "und")
+        val position = (0 until itemCount).firstOrNull { getItem(it)?.id == messageId }
+        position?.let { notifyItemChanged(it) }
+    }
+
+    /**
+     * Binds the translate button state: default pill or Gemini-style processing animation.
+     */
+    private fun bindTranslateButton(
+        container: FrameLayout,
+        icon: ImageView,
+        processingState: dev.octoshrimpy.quik.manager.TranslationState?,
+        hasCachedTranslation: Boolean
+    ) {
+        // Cancel any previous spin animator stored as a tag
+        (container.getTag(SPIN_ANIM_TAG) as? ObjectAnimator)?.cancel()
+        (container.getTag(SPIN_ANIM_TAG + 1) as? ValueAnimator)?.cancel()
+
+        if (processingState != null) {
+            // ---- PROCESSING STATE: spinning AI sparkle + static color tint ----
+            icon.setImageResource(R.drawable.ic_ai_sparkle)
+            icon.alpha = 1f
+            icon.setColorFilter(theme.theme) // Static vibrant brand color instead of flashing gradients
+
+            // Continuous smooth rotation spin animation for the icon
+            val spinAnim = ObjectAnimator.ofFloat(icon, "rotation", 0f, 360f).apply {
+                duration = 1500
+                repeatCount = ObjectAnimator.INFINITE
+                interpolator = android.view.animation.LinearInterpolator()
+                start()
+            }
+            container.setTag(SPIN_ANIM_TAG, spinAnim)
+        } else {
+            // ---- DEFAULT STATE: subtle pill ----
+            icon.setImageResource(R.drawable.ic_translate_black_24dp)
+            container.background = androidx.core.content.ContextCompat.getDrawable(
+                container.context, R.drawable.bg_translate_button
+            )
+            if (!hasCachedTranslation) {
+                icon.setColorFilter(android.graphics.Color.WHITE)
+                container.backgroundTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#3E64D7"))
+            } else {
+                icon.clearColorFilter()
+                container.backgroundTintList = null
+            }
+            icon.alpha = if (hasCachedTranslation) 0.3f else 1f // Disabled visual look when cached
+            icon.rotation = 0f
+        }
     }
 
     /**

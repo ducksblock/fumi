@@ -1,0 +1,56 @@
+<!--
+  ~ App icon for fumi — designed in Figma, converted to Android VectorDrawable.
+  ~ Uses the fumi brand identity with layered panels.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <group
+        android:translateX="42"
+        android:translateY="42">
+
+        <group
+            android:pivotX="12"
+            android:pivotY="12"
+            android:scaleX="0.38"
+            android:scaleY="0.38">
+
+        <!-- Back panel fill: purple -->
+        <path
+            android:fillColor="#A19AFF"
+            android:pathData="M4.875,1.5L2.25,4.125L1.5,5.25V16.125C1.5,16.425 2,16.5 2.25,16.5L5.625,15L7.875,14.25L15.375,13.875L17.625,11.25L18,7.125L17.625,5.25L15.75,2.25L12,1.5H4.875Z" />
+
+        <!-- Front panel fill: yellow -->
+        <path
+            android:fillColor="#FFE99A"
+            android:pathData="M9.375,6.75L6.75,9.375L6,10.5V21.375C6,21.675 6.5,21.75 6.75,21.75L10.125,20.25L12.375,19.5L19.875,19.125L22.125,16.5L22.5,12.375L22.125,10.5L20.25,7.5L16.5,6.75H9.375Z" />
+
+        <!-- Overlap fill: tan -->
+        <path
+            android:fillColor="#C7AC9A"
+            android:pathData="M9,7.125L7.125,9L5.625,14.625L7.5,14.25H13.875L17.625,10.875L18.375,7.125L17.25,6.75L9,7.125Z" />
+
+        <!-- Back panel outline -->
+        <path
+            android:fillColor="#00000000"
+            android:strokeColor="#000000"
+            android:strokeWidth="1.5"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:pathData="M6.6,1.5C3.75,1.5 1.5,3.75 1.5,6.525V14.1V17.25C3.825,15.225 6.825,14.1 9.975,14.1H12.975C15.75,14.1 18.075,11.85 18.075,9.075V6.525C18,3.75 15.75,1.5 12.9,1.5H6.6Z" />
+
+        <!-- Front panel outline -->
+        <path
+            android:fillColor="#00000000"
+            android:strokeColor="#000000"
+            android:strokeWidth="1.5"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"
+            android:pathData="M11.1,6.75C8.25,6.75 6,9 6,11.775V19.35V22.5C8.325,20.475 11.325,19.35 14.475,19.35H17.475C20.25,19.35 22.575,17.1 22.575,14.325V11.775C22.5,9 20.25,6.75 17.4,6.75H11.1Z" />
+    </group>
+</group>
+
+</vector>

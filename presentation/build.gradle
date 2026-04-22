@@ -25,29 +25,41 @@ android {
     compileSdk 34
 
     defaultConfig {
-        applicationId 'dev.octoshrimpy.quik'
-        minSdkVersion 23
+        applicationId 'com.fumi.app'
+        minSdkVersion 26
         targetSdkVersion 33
         versionCode 2236
-        versionName '4.3.4'
-        setProperty("archivesBaseName", "QUIK-v${versionName}")
+        versionName '1.0.0'
+        setProperty("archivesBaseName", "fumi")
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        externalNativeBuild {
+            cmake {
+                cppFlags ""
+                arguments "-DANDROID_STL=c++_shared"
+            }
+        }
     }
 
     signingConfigs {
         debug // Uses the default debug keystore.
         release {
-            def keystoreProps = new Properties()
-            def keystorePropsFile = rootProject.file('./.gradle/.gradlerc')
-            storeFile file('./my-release-key.keystore')
-            keyAlias 'quik_release'
+            def keystorePropsFile = rootProject.file('keystore.properties')
             if (keystorePropsFile.exists()) {
+                def keystoreProps = new Properties()
                 keystoreProps.load(new FileInputStream(keystorePropsFile))
+                storeFile file(keystoreProps['storeFile'])
+                keyAlias keystoreProps['keyAlias']
+                storePassword keystoreProps['storePassword']
+                keyPassword keystoreProps['keyPassword']
             } else {
-                // do nothing
+                // Fallback to debug if properties are missing
+                println "Release signing properties not found, falling back to debug key."
+                storeFile signingConfigs.debug.storeFile
+                storePassword signingConfigs.debug.storePassword
+                keyAlias signingConfigs.debug.keyAlias
+                keyPassword signingConfigs.debug.keyPassword
             }
-            storePassword keystoreProps['storePassword']
-            keyPassword keystoreProps['keyPassword']
         }
     }
 
@@ -56,6 +68,10 @@ android {
         includeInApk = false
         // Disables dependency metadata when building Android App Bundles.
         includeInBundle = false
+    }
+
+    aaptOptions {
+        noCompress "onnx", "json", "spm"
     }
     
     buildTypes {
@@ -68,7 +84,7 @@ android {
         debug {
             applicationIdSuffix ".debug"
             versionNameSuffix "-debug"
-            resValue("string", "app_name", "QUIK-Debug")
+            resValue("string", "app_name", "fumi")
             resValue("string", "application_id", defaultConfig.applicationId)
             signingConfig signingConfigs.debug
         }
@@ -93,6 +109,12 @@ android {
 
     lint {
         abortOnError false
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+        }
     }
     namespace 'dev.octoshrimpy.quik'
     buildFeatures {
@@ -213,12 +235,12 @@ dependencies {
     implementation project(':domain')
 
 }
-// Check to make sure that the keystore file is present when building a release
+// Ensure that the keystore properties file is present when building a release
 gradle.taskGraph.whenReady { taskGraph ->
-    if ((taskGraph.hasTask(':assembleRelease') ||
+    if ((taskGraph.hasTask(':presentation:assembleRelease') ||
             taskGraph.allTasks.any { it.name == 'assembleRelease' }) &&
-            !file('./.gradle/.gradlerc').exists() &&
+            !rootProject.file('keystore.properties').exists() &&
             System.getenv("CI") != "true") {
-        throw new GradleException("Keystore properties file not found")
+        throw new GradleException("Keystore properties file (keystore.properties) not found in root directory. Official release builds require this for signing.")
     }
 }

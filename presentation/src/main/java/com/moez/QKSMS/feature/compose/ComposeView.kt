@@ -78,6 +78,7 @@ interface ComposeView : QkView<ComposeState> {
     val clearCurrentMessageIntent: Subject<Boolean>
     val messageLinkAskIntent: Observable<Uri>
     val reactionClickIntent: Subject<Long>
+    val translateClickIntent: Subject<Long>
     val speechRecogniserIntent: Observable<*>
     val shadeIntent: Observable<Unit>
     val recordAudioStartStopRecording: Subject<Boolean>
@@ -113,6 +114,7 @@ interface ComposeView : QkView<ComposeState> {
     fun showDeleteDialog( messages: List<Long>)
     fun showClearCurrentMessageDialog()
     fun showReactionsDialog(reactions: List<String>)
+    fun showTranslation(messageId: Long, state: dev.octoshrimpy.quik.manager.TranslationState)
     fun startSpeechRecognition()
     fun focusMessage()
 }

@@ -55,7 +55,9 @@ interface MainView : QkView<MainState> {
     fun showRenameDialog(conversationName: String)
     fun showChangelog(changelog: ChangelogManager.CumulativeChangelog)
     fun showArchivedSnackbar(countConversationsArchived: Int, isArchiving: Boolean)
+    fun showTranslateLanguagePicker()
+    fun translateLanguageSelected(): Observable<Int>
     fun drawerToggled(opened: Boolean)
 }
 
-enum class NavItem { BACK, INBOX, ARCHIVED, BACKUP, SCHEDULED, BLOCKING, MESSAGE_UTILS, SETTINGS, ABOUT, PLUS, HELP, INVITE }
+enum class NavItem { BACK, INBOX, ARCHIVED, BACKUP, SCHEDULED, MESSAGE_UTILS, SETTINGS, ABOUT, PLUS, HELP, INVITE }

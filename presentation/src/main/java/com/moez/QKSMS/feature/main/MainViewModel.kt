@@ -18,6 +18,7 @@
  */
 package dev.octoshrimpy.quik.feature.main
 
+import android.content.Context
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.uber.autodispose.android.lifecycle.scope
 import com.uber.autodispose.autoDisposable
@@ -83,7 +84,8 @@ class MainViewModel @Inject constructor(
     private val ratingManager: RatingManager,
     private val reactions: EmojiReactionRepository,
     private val syncContacts: SyncContacts,
-    private val syncMessages: SyncMessages
+    private val syncMessages: SyncMessages,
+    private val context: Context
 ) : QkViewModel<MainView, MainState>(
     MainState(page = Inbox(data = conversationRepo.getConversations(prefs.unreadAtTop.get())))
 ) {
@@ -140,6 +142,9 @@ class MainViewModel @Inject constructor(
                     .subscribeOn(Schedulers.io())
                     .subscribe { syncContacts.execute(Unit) }
         }
+
+        disposables += prefs.didSetTranslateLanguage.asObservable()
+            .subscribe { set -> newState { copy(translateLanguageSet = set) } }
 
         ratingManager.addSession()
         markAllSeen.execute(Unit)
@@ -229,7 +234,6 @@ class MainViewModel @Inject constructor(
                 .subscribe { intent ->
                     when (intent.getStringExtra("screen")) {
                         "compose" -> navigator.showConversation(intent.getLongExtra("threadId", 0))
-                        "blocking" -> navigator.showBlockedConversations()
                     }
                 }
 
@@ -330,7 +334,6 @@ class MainViewModel @Inject constructor(
                         }
                         NavItem.BACKUP -> navigator.showBackup()
                         NavItem.SCHEDULED -> navigator.showScheduled(null)
-                        NavItem.BLOCKING -> navigator.showBlockedConversations()
                         NavItem.MESSAGE_UTILS -> navigator.showMessageUtils()
                         NavItem.SETTINGS -> navigator.showSettings()
                         NavItem.ABOUT -> navigator.showAbout()
@@ -582,10 +585,22 @@ class MainViewModel @Inject constructor(
                                 view.requestPermissions()
                             }
                         }
+                        !state.translateLanguageSet -> {
+                            view.showTranslateLanguagePicker()
+                        }
                     }
                 }
                 .autoDisposable(view.scope())
                 .subscribe()
+
+        view.translateLanguageSelected()
+            .autoDisposable(view.scope())
+            .subscribe { index ->
+                val codes = context.resources.getStringArray(R.array.translate_language_ids)
+                val code = codes.getOrNull(index) ?: "hi"
+                prefs.translateLanguage.set(code)
+                prefs.didSetTranslateLanguage.set(true)
+            }
     }
 
 }

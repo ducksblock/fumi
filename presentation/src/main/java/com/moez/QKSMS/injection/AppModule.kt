@@ -172,6 +172,9 @@ class AppModule(private var application: Application) {
     @Provides
     fun provideWidgetManager(manager: WidgetManagerImpl): WidgetManager = manager
 
+    @Provides
+    fun provideTranslationManager(manager: dev.octoshrimpy.quik.manager.TranslationManagerImpl): dev.octoshrimpy.quik.manager.TranslationManager = manager
+
     // Mapper
 
     @Provides

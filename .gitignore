@@ -51,11 +51,15 @@ freeline/
 freeline_project_description.json
 
 # secrets / keystore files
-my-release-key.keystore
+*.keystore
+keystore.properties
 my-release-key.keystore.base64
 .secrets
 android-keystore/keystore.b64
 keystore.p12
 config.yml
 *.jks
+.vscode/
+secrets.tar.enc
+node_modules/
 

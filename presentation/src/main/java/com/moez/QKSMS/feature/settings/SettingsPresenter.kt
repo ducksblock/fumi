@@ -143,6 +143,19 @@ class SettingsPresenter @Inject constructor(
         disposables += prefs.disableScreenshots.asObservable()
             .subscribe { enabled -> newState { copy(disableScreenshotsEnabled = enabled) } }
 
+        // Translate language labels: same order as translate_language_labels / translate_language_ids arrays
+        val translateLanguageLabels = context.resources.getStringArray(R.array.translate_language_labels)
+        val translateLanguageCodes = context.resources.getStringArray(R.array.translate_language_ids)
+
+        disposables += prefs.translateLanguage.asObservable()
+            .subscribe { code ->
+                val idx = translateLanguageCodes.indexOfFirst { it == code }.coerceAtLeast(0)
+                newState { copy(
+                    translateLanguageSummary = translateLanguageLabels.getOrElse(idx) { "Hindi" },
+                    translateLanguageId = idx
+                ) }
+            }
+
         disposables += syncRepo.syncProgress
                 .sample(16, TimeUnit.MILLISECONDS)
                 .distinctUntilChanged()
@@ -216,6 +229,8 @@ class SettingsPresenter @Inject constructor(
 
                         R.id.disableScreenshots -> prefs.disableScreenshots.set(!prefs.disableScreenshots.get())
 
+                        R.id.translateLanguage -> view.showTranslateLanguagePicker()
+
                         R.id.sync -> syncMessages.execute(Unit)
 
                         R.id.about -> view.showAbout()
@@ -283,6 +298,14 @@ class SettingsPresenter @Inject constructor(
         view.messageLinkHandlingSelected()
             .autoDisposable(view.scope())
             .subscribe(prefs.messageLinkHandling::set)
+
+        view.translateLanguageSelected()
+            .autoDisposable(view.scope())
+            .subscribe { index ->
+                val codes = context.resources.getStringArray(R.array.translate_language_ids)
+                val code = codes.getOrNull(index) ?: "hi"
+                prefs.translateLanguage.set(code)
+            }
     }
 
 }

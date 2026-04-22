@@ -1,0 +1,7 @@
+# ninja log v5
+1	191	7985838746693232	CMakeFiles/fumi-native.dir/dummy.cpp.o	c65ec36c1155709b
+194	384	7985838748844521	D:/Code/2026/fumi/fumi/presentation/build/intermediates/cxx/RelWithDebInfo/50496y38/obj/x86/libfumi-native.so	d1e57244409aed61
+1	10	0	clean	526712d335180fdc
+0	9	0	clean	526712d335180fdc
+2	146	7985850410494519	CMakeFiles/fumi-native.dir/dummy.cpp.o	c65ec36c1155709b
+147	323	7985850412283373	D:/Code/2026/fumi/fumi/presentation/build/intermediates/cxx/RelWithDebInfo/50496y38/obj/x86/libfumi-native.so	d1e57244409aed61

@@ -69,6 +69,7 @@ class SettingsController : QkController<SettingsControllerBinding, SettingsView,
     @Inject lateinit var sendDelayDialog: QkDialog
     @Inject lateinit var mmsSizeDialog: QkDialog
     @Inject lateinit var messageLinkHandlingDialog: QkDialog
+    @Inject lateinit var translateLanguageDialog: QkDialog
 
     @Inject override lateinit var presenter: SettingsPresenter
 
@@ -105,6 +106,7 @@ class SettingsController : QkController<SettingsControllerBinding, SettingsView,
         sendDelayDialog.adapter.setData(R.array.delayed_sending_labels)
         mmsSizeDialog.adapter.setData(R.array.mms_sizes, R.array.mms_sizes_ids)
         messageLinkHandlingDialog.adapter.setData(R.array.messageLinkHandlings, R.array.messageLinkHandling_ids)
+        translateLanguageDialog.adapter.setData(R.array.translate_language_labels)
 
         binding.about.summary = context.getString(R.string.settings_version, BuildConfig.VERSION_NAME)
     }
@@ -139,6 +141,8 @@ class SettingsController : QkController<SettingsControllerBinding, SettingsView,
     override fun signatureChanged(): Observable<String> = signatureSubject
 
     override fun mmsSizeSelected(): Observable<Int> = mmsSizeDialog.adapter.menuItemClicks
+
+    override fun translateLanguageSelected(): Observable<Int> = translateLanguageDialog.adapter.menuItemClicks
 
     override fun messageLinkHandlingSelected(): Observable<Int> = messageLinkHandlingDialog.adapter.menuItemClicks
 
@@ -185,6 +189,9 @@ class SettingsController : QkController<SettingsControllerBinding, SettingsView,
 
         binding.messsageLinkHandling.summary = state.messageLinkHandlingSummary
         messageLinkHandlingDialog.adapter.selectedItem = state.messageLinkHandlingId
+
+        binding.translateLanguage.summary = state.translateLanguageSummary
+        translateLanguageDialog.adapter.selectedItem = state.translateLanguageId
 
         binding.disableScreenshots.checkbox?.isChecked = state.disableScreenshotsEnabled
 
@@ -241,6 +248,8 @@ class SettingsController : QkController<SettingsControllerBinding, SettingsView,
     override fun showMmsSizePicker() = mmsSizeDialog.show(activity!!)
 
     override fun showMessageLinkHandlingDialogPicker() = messageLinkHandlingDialog.show(activity!!)
+
+    override fun showTranslateLanguagePicker() = translateLanguageDialog.show(activity!!)
 
     override fun showSwipeActions() {
         router.pushController(RouterTransaction.with(SwipeActionsController())

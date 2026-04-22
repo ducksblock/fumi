@@ -94,6 +94,7 @@ import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -127,6 +128,7 @@ class ComposeViewModel @Inject constructor(
     private val sendNewMessage: SendNewMessage,
     private val subscriptionManager: SubscriptionManagerCompat,
     private val saveImage: SaveImage,
+    private val translationManager: dev.octoshrimpy.quik.manager.TranslationManager,
 ) : QkViewModel<ComposeView, ComposeState>(ComposeState(
         editingMode = threadId == 0L && addresses.isEmpty(),
         threadId = threadId,
@@ -775,6 +777,21 @@ class ComposeViewModel @Inject constructor(
             }
             .autoDisposable(view.scope())
             .subscribe { reactions -> view.showReactionsDialog(reactions) }
+
+        // Translate message using Google ML Kit Translate
+        view.translateClickIntent
+            .mapNotNull { messageId -> messageRepo.getMessage(messageId)?.let { Pair(messageId, it.getText(false)) } }
+            .observeOn(Schedulers.io())
+            .switchMap { (messageId, text) ->
+                val targetLanguage = prefs.translateLanguage.get()
+                translationManager.translate(text, targetLanguage)
+                    .map { state -> Pair(messageId, state) }
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .autoDisposable(view.scope())
+            .subscribe { (messageId, state) ->
+                view.showTranslation(messageId, state)
+            }
 
         // Set the current conversation
         Observables

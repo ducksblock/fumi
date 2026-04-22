@@ -47,6 +47,8 @@ import dagger.android.AndroidInjection
 import dev.octoshrimpy.quik.R
 import dev.octoshrimpy.quik.common.Navigator
 import dev.octoshrimpy.quik.common.androidxcompat.drawerOpen
+import dev.octoshrimpy.quik.common.MenuItemAdapter
+import dev.octoshrimpy.quik.common.QkDialog
 import dev.octoshrimpy.quik.common.base.QkThemedActivity
 import dev.octoshrimpy.quik.common.util.extensions.autoScrollToStart
 import dev.octoshrimpy.quik.common.util.extensions.dismissKeyboard
@@ -101,7 +103,7 @@ class MainActivity : QkThemedActivity(), MainView {
                 binding.drawer.archived.clicks().map { NavItem.ARCHIVED },
                 binding.drawer.backup.clicks().map { NavItem.BACKUP },
                 binding.drawer.scheduled.clicks().map { NavItem.SCHEDULED },
-                binding.drawer.blocking.clicks().map { NavItem.BLOCKING },
+
                 binding.drawer.messageUtils.clicks().map { NavItem.MESSAGE_UTILS },
                 binding.drawer.settings.clicks().map { NavItem.SETTINGS },
                 binding.drawer.about.clicks().map { NavItem.ABOUT },
@@ -137,6 +139,9 @@ class MainActivity : QkThemedActivity(), MainView {
     private val progressAnimator by lazy {
         ObjectAnimator.ofInt(syncingBinding.syncingProgress, "progress", 0, 0)
     }
+    private val translateLanguageDialog: QkDialog by lazy {
+        QkDialog(this, MenuItemAdapter(this, colors))
+    }
     private val changelogDialog by lazy { ChangelogDialog(this) }
     private val backPressedSubject: Subject<NavItem> = PublishSubject.create()
 
@@ -158,6 +163,9 @@ class MainActivity : QkThemedActivity(), MainView {
             it.syncingProgress.progressTintList = ColorStateList.valueOf(theme.blockingFirst().theme)
             it.syncingProgress.indeterminateTintList = ColorStateList.valueOf(theme.blockingFirst().theme)
         }
+
+        translateLanguageDialog.adapter.setData(R.array.translate_language_labels)
+        translateLanguageDialog.setTitle(R.string.settings_translate_language_title)
 
         toggle.syncState()
         binding.toolbar.setNavigationOnClickListener {
@@ -327,7 +335,8 @@ class MainActivity : QkThemedActivity(), MainView {
                 snackbarBinding.root.isVisible = (!state.defaultSms ||
                         !state.smsPermission ||
                         !state.contactPermission ||
-                        !state.notificationPermission)
+                        !state.notificationPermission ||
+                        !state.translateLanguageSet)
             }
 
             is SyncRepository.SyncProgress.Running -> {
@@ -375,6 +384,12 @@ class MainActivity : QkThemedActivity(), MainView {
                 snackbarBinding.snackbarTitle.setText(R.string.main_permission_required)
                 snackbarBinding.snackbarMessage.setText(R.string.main_permission_notifications)
                 snackbarBinding.snackbarButton.setText(R.string.main_permission_allow)
+            }
+
+            !state.translateLanguageSet -> {
+                snackbarBinding.snackbarTitle.setText(R.string.settings_category_translation)
+                snackbarBinding.snackbarMessage.setText(R.string.settings_translate_language_title)
+                snackbarBinding.snackbarButton.setText(R.string.button_select)
             }
         }
     }
@@ -470,6 +485,12 @@ class MainActivity : QkThemedActivity(), MainView {
             it.setActionTextColor(colors.theme().theme)
             it.show()
         }
+
+    override fun showTranslateLanguagePicker() {
+        translateLanguageDialog.show(this)
+    }
+
+    override fun translateLanguageSelected(): Observable<Int> = translateLanguageDialog.adapter.menuItemClicks
 
     override fun onCreateOptionsMenu(menu: Menu?) =
         menu?.let {

@@ -141,6 +141,7 @@ class ComposeActivity : QkThemedActivity(), ComposeView {
     override val clearCurrentMessageIntent: Subject<Boolean> = PublishSubject.create()
     override val messageLinkAskIntent: Subject<Uri> by lazy { messageAdapter.messageLinkClicks }
     override val reactionClickIntent: Subject<Long> by lazy { messageAdapter.reactionClicks }
+    override val translateClickIntent: Subject<Long> by lazy { messageAdapter.translateClicks }
     override val speechRecogniserIntent by lazy { binding.speechToTextIcon.clicks() }
     override val shadeIntent by lazy { binding.shadeBackground.clicks() }
     override val recordAudioStartStopRecording: Subject<Boolean> = PublishSubject.create()
@@ -546,6 +547,10 @@ class ComposeActivity : QkThemedActivity(), ComposeView {
 
     override fun expandMessages(messageIds: List<Long>, expand: Boolean) {
         messageAdapter.expandMessages(messageIds, expand)
+    }
+
+    override fun showTranslation(messageId: Long, state: dev.octoshrimpy.quik.manager.TranslationState) {
+        messageAdapter.showTranslation(messageId, state)
     }
 
     override fun showDetails(details: String) {

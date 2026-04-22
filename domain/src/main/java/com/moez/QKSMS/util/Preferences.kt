@@ -105,10 +105,10 @@ class Preferences @Inject constructor(
     })
     val nightStart = rxPrefs.getString("nightStart", "18:00")
     val nightEnd = rxPrefs.getString("nightEnd", "6:00")
-    val black = rxPrefs.getBoolean("black", false)
+    val black = rxPrefs.getBoolean("black", true)
     val autoColor = rxPrefs.getBoolean("autoColor", true)
-    val systemFont = rxPrefs.getBoolean("systemFont", false)
-    val showStt = rxPrefs.getBoolean("showStt", true)
+    val systemFont = rxPrefs.getBoolean("systemFont", true)
+    val showStt = rxPrefs.getBoolean("showStt", false)
     val showSttOffsetX = rxPrefs.getFloat("showSttOffsetX", Float.MIN_VALUE)
     val showSttOffsetY = rxPrefs.getFloat("showSttOffsetY", Float.MIN_VALUE)
     val textSize = rxPrefs.getInteger("textSize", TEXT_SIZE_NORMAL)
@@ -135,6 +135,8 @@ class Preferences @Inject constructor(
     val disableScreenshots = rxPrefs.getBoolean("disableScreenshots", false)
     val logging = rxPrefs.getBoolean("logging", false)
     val unreadAtTop = rxPrefs.getBoolean("unreadAtTop", false)
+    val translateLanguage = rxPrefs.getString("translateLanguage", "hi") // default: Hindi
+    val didSetTranslateLanguage = rxPrefs.getBoolean("didSetTranslateLanguage", false)
 
     val autoDeduplicate = rxPrefs.getBoolean("autoDeduplicateMessages", false)
 
@@ -171,10 +173,10 @@ class Preferences @Inject constructor(
 
     fun theme(
         recipientId: Long = 0,
-        default: Int = rxPrefs.getInteger("theme", 0xFF0097A7.toInt()).get()
+        default: Int = rxPrefs.getInteger("theme", 0xFF673AB7.toInt()).get()
     ): Preference<Int> {
         return when (recipientId) {
-            0L -> rxPrefs.getInteger("theme", 0xFF0097A7.toInt())
+            0L -> rxPrefs.getInteger("theme", 0xFF673AB7.toInt())
             else -> rxPrefs.getInteger("theme_$recipientId", default)
         }
     }

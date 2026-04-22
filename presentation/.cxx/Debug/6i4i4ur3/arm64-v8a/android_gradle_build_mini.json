@@ -1,0 +1,27 @@
+{
+  "buildFiles": [
+    "D:\\Code\\2026\\fumi\\fumi\\presentation\\src\\main\\cpp\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "C:\\Users\\prana\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+      "-C",
+      "D:\\Code\\2026\\fumi\\fumi\\presentation\\.cxx\\Debug\\6i4i4ur3\\arm64-v8a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "C:\\Users\\prana\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+    "-C",
+    "D:\\Code\\2026\\fumi\\fumi\\presentation\\.cxx\\Debug\\6i4i4ur3\\arm64-v8a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "fumi-native::@6890427a1f51a3e7e1df": {
+      "artifactName": "fumi-native",
+      "abi": "arm64-v8a",
+      "output": "D:\\Code\\2026\\fumi\\fumi\\presentation\\build\\intermediates\\cxx\\Debug\\6i4i4ur3\\obj\\arm64-v8a\\libfumi-native.so",
+      "runtimeFiles": []
+    }
+  }
+}

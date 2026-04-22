@@ -1,0 +1,3 @@
+D:/Code/2026/fumi/fumi/presentation/.cxx/RelWithDebInfo/50496y38/arm64-v8a/CMakeFiles/fumi-native.dir
+D:/Code/2026/fumi/fumi/presentation/.cxx/RelWithDebInfo/50496y38/arm64-v8a/CMakeFiles/edit_cache.dir
+D:/Code/2026/fumi/fumi/presentation/.cxx/RelWithDebInfo/50496y38/arm64-v8a/CMakeFiles/rebuild_cache.dir
