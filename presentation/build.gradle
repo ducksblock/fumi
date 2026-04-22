@@ -33,12 +33,6 @@ android {
         setProperty("archivesBaseName", "fumi")
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        externalNativeBuild {
-            cmake {
-                cppFlags ""
-                arguments "-DANDROID_STL=c++_shared"
-            }
-        }
     }
 
     signingConfigs {
@@ -111,11 +105,6 @@ android {
         abortOnError false
     }
 
-    externalNativeBuild {
-        cmake {
-            path "src/main/cpp/CMakeLists.txt"
-        }
-    }
     namespace 'dev.octoshrimpy.quik'
     buildFeatures {
         buildConfig true
