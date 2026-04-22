@@ -16,6 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with QKSMS.  If not, see <http://www.gnu.org/licenses/>.
  */
+import com.android.build.OutputFile
+
 apply plugin: 'com.android.application'
 apply plugin: 'realm-android' // Realm needs to be before Kotlin or the build will fail
 apply plugin: 'kotlin-android'
@@ -64,8 +66,13 @@ android {
         includeInBundle = false
     }
 
-    aaptOptions {
-        noCompress "onnx", "json", "spm"
+    splits {
+        abi {
+            enable true
+            reset()
+            include "arm64-v8a", "armeabi-v7a", "x86", "x86_64"
+            universalApk true
+        }
     }
     
     buildTypes {
@@ -114,6 +121,19 @@ android {
         signingConfigs.release.storePassword = System.getenv("keystore_password")
         signingConfigs.release.keyAlias = System.getenv("key_alias")
         signingConfigs.release.keyPassword = System.getenv("key_password")
+    }
+}
+
+android.applicationVariants.all { variant ->
+    if (variant.buildType.name == "release") {
+        variant.outputs.each { output ->
+            def abi = output.getFilter(OutputFile.ABI)
+            if (abi == null) {
+                output.outputFileName = "fumi-v${variant.versionName}-universal.apk"
+            } else {
+                output.outputFileName = "fumi-v${variant.versionName}-${abi}.apk"
+            }
+        }
     }
 }
 

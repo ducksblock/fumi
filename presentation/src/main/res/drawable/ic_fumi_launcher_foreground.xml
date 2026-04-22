@@ -15,8 +15,8 @@
         <group
             android:pivotX="12"
             android:pivotY="12"
-            android:scaleX="0.532"
-            android:scaleY="0.532">
+            android:scaleX="2.04"
+            android:scaleY="2.04">
 
         <!-- Back panel fill: purple -->
         <path
