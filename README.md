@@ -1,3 +1,5 @@
+<img width="1280" height="640" alt="fumi-github-picture" src="https://github.com/user-attachments/assets/5f35a27f-365a-4215-bc48-ec92d8aea315" />
+
 # ✨ fumi Messenger
 
 **Translate SMS messages instantly - right inside your inbox.**
