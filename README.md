@@ -2,7 +2,7 @@
 
 # ✨ fumi Messenger
 
-**Translate SMS messages instantly - right inside your inbox.**
+**Translate SMS messages instantly — right inside your inbox.**
 
 Fumi is a modern SMS app built on top of QKSMS/QUIK, enhanced with **on-device AI-powered translation** for seamless multilingual conversations.
 
@@ -12,6 +12,9 @@ Fumi is a modern SMS app built on top of QKSMS/QUIK, enhanced with **on-device A
 
 - 🌐 **AI-powered translation**  
   Translate messages directly within conversations
+
+- 🧠 **Auto language detection**  
+  Detect the message language and translate it to your preferred language
 
 - ⚡ **One-tap translate**  
   Tap the icon to instantly view translated text
@@ -27,14 +30,28 @@ Fumi is a modern SMS app built on top of QKSMS/QUIK, enhanced with **on-device A
 
 ---
 
+## 🌍 Supported Languages
+
+Fumi is designed to help you communicate across languages, including major Indian languages such as:
+
+- Bengali (বাংলা)
+- Gujarati (ગુજરાતી)
+- Hindi (हिन्दी)
+- Kannada (ಕನ್ನಡ)
+- Marathi (मराठी)
+- Tamil (தமிழ்)
+- Telugu (తెలుగు)
+
+---
+
 ## 💡 Why Fumi?
 
 Language should not be a barrier in everyday messaging.
 
 Fumi helps you:
-- Read messages in your preferred language  
-- Communicate across languages effortlessly  
-- Keep everything fast, simple, and private  
+- Read messages in your preferred language
+- Communicate across languages effortlessly
+- Keep everything fast, simple, and private
 
 ---
 
@@ -62,9 +79,9 @@ Please check `CONTRIBUTING.md` for guidelines.
 
 ## ❤️ Acknowledgements
 
-- QKSMS by Moez Bhatti  
-- QUIK by octoshrimpy  
-- All contributors to the original projects  
+- QKSMS by Moez Bhatti
+- QUIK by octoshrimpy
+- All contributors to the original projects
 
 ---
 
